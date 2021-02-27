@@ -12,6 +12,7 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv, find_dotenv
 import os 
+import logging
 
 class LinkedInBot:
     def __init__(self, verbose=True, useProxy=False, delay=5):
@@ -94,6 +95,7 @@ class LinkedInBot:
         """Enter keywords into search bar
         """
         # search based on keywords and location and hit enter
+        logging.info("Waiting for page load")
         self.wait_for_element_ready(By.CLASS_NAME, 'jobs-search-box__text-input')
         time.sleep(self.delay)
         search_bars = self.driver.find_elements_by_class_name('jobs-search-box__text-input')
@@ -103,7 +105,7 @@ class LinkedInBot:
         search_location.send_keys(location)
         time.sleep(self.delay)
         search_location.send_keys(Keys.RETURN)
-        if self.verbose: print("Keyword search successful...")
+        logging.info("Keyword search successful")
         time.sleep(self.delay)
 
 

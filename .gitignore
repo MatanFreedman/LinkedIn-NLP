@@ -40,3 +40,6 @@ venv/
 
 # driver log
 geckodriver.log
+
+# random cookie file:
+cookies.txt

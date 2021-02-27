@@ -1,11 +1,12 @@
 import sqlite3
 from pathlib import Path
+import logging
 
 
 class DBConnection:
     project_path = Path(__file__).resolve().parents[2]
     data_path = str(project_path) + "/data/raw/"
-    conn = sqlite3.connect(data_path + 'linedin_data.db')
+    conn = sqlite3.connect(data_path + 'linkedin_data.db')
     cur = conn.cursor()
 
     def __init__(self):
@@ -29,8 +30,14 @@ class DBConnection:
         """Close DB connection"""
         self.conn.close()
 
-    def insert_position(self, data):
-        """Checks for duplicate in DB, inserts if no dup.
+    def is_duplicate(self, data):
+        """Check if data is duplicate
+
+        Parameters
+        ---------
+        data : tuple : (position, company, location, details) - all strings
+
+        Returns : Boolean if duplicate
         """
         # check DB for duplicate:
         self.cur.execute("""
@@ -44,11 +51,22 @@ class DBConnection:
             """, data)
 
         if self.cur.fetchone() is None:
-            # if no duplicate, insert and commit:
-            self.cur.execute("""
+            return False 
+        else:
+            return True
+
+
+    def insert_position(self, data):
+        """Inserts into DB.
+
+        Parameters
+        ---------
+        data : tuple : (position, company, location, details) - all strings
+        """
+        self.cur.execute("""
             INSERT INTO positions(position, company, location, details, date) VALUES (?, ?, ?, ?, date('now'))
             """, data)
-            self.conn.commit()
+        self.conn.commit()
 
 if __name__ == "__main__":
     db = DBConnection()

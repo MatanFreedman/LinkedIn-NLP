@@ -1,40 +1,78 @@
 import os
 from dotenv import load_dotenv, find_dotenv
+import logging
+import pickle
+from pathlib import Path
 
 from DBConnection import DBConnection 
 from LinkedInBot import LinkedInBot
-load_dotenv(find_dotenv())
 
-db = DBConnection()
+def save_cookie(driver, path):
+    with open(path, 'wb') as filehandler:
+        pickle.dump(driver.get_cookies(), filehandler)
 
-bot = LinkedInBot(useProxy=False)
+def load_cookie(driver, path):
+     with open(path, 'rb') as cookiesfile:
+         cookies = pickle.load(cookiesfile)
+         for cookie in cookies:
+             driver.add_cookie(cookie)
 
-EMAIL = os.getenv("EMAIL")
-PASSWORD = os.getenv("PASSWORD")
-bot.login(
-    email=EMAIL,
-    password=PASSWORD
-)
-bot.go_to_job_page()
-bot.search_linkedin(keywords = "Data Analyst", location = "Canada")
-bot.wait()
-
-# scrape pages:  
-for page in range(2,4):
-    # get the jobs list items to scroll through:
-    jobs = bot.get_job_page_list_items()
-    for job in jobs:
-        bot.scroll_to(job)
-        [position, company, location] = job.text.split('\n')[:3]
-        details = bot.driver.find_element_by_id("job-details").text
-
-        # send to DB:
-        data = (position, company, location, details)
-        db.insert_position(data)
-
-        # just to view in cmd window:
-        print([position, company])
-
-    # go to next page:
-    bot.driver.find_element_by_xpath(f"//button[@aria-label='Page {page}']").click()
+def scrape_search(bot, keywords, location):
+    logging.info("Going to Jobs page")
+    bot.go_to_job_page()
+    logging.info("Begin linkedin keyword search")
+    bot.search_linkedin(keywords = keywords, location = location)
     bot.wait()
+    # scrape pages,only do first 8 pages since after that the data isn't 
+    # well suited for me anyways:  
+    for page in range(2, 9):
+        # get the jobs list items to scroll through:
+        jobs = bot.get_job_page_list_items()
+        for job in jobs:
+            bot.scroll_to(job)
+            [position, company, location] = job.text.split('\n')[:3]
+            details = bot.driver.find_element_by_id("job-details").text
+
+            # send to DB:
+            data = (position, company, location, details)
+            if not db.is_duplicate(data):
+                db.insert_position(data)
+                # just to view in cmd window:
+                logging.info(f"Added to DB: {position}, {company}, {location}")
+            else:
+                logging.info(f"Duplicate entry found: {position}, {company}, {location}")
+
+        # go to next page:
+        bot.driver.find_element_by_xpath(f"//button[@aria-label='Page {page}']").click()
+        logging.info(f"Going to page {page}")
+        bot.wait()
+
+    logging.info("Duplicate entries exceeded")
+
+
+if __name__ == "__main__":
+    load_dotenv(find_dotenv())
+    db = DBConnection()
+    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=logging.INFO, format=log_fmt)
+    data_dir = Path(__file__).resolve().parents[0]
+
+    bot = LinkedInBot(useProxy=False)
+
+    if os.path.exists(str(data_dir) + "/cookies.txt"):
+        bot.driver.get("https://www.linkedin.com/")
+        load_cookie(bot.driver, str(data_dir) + "/cookies.txt")
+        bot.driver.get("https://www.linkedin.com/")
+    else:
+        EMAIL = os.getenv("EMAIL")
+        PASSWORD = os.getenv("PASSWORD")
+        bot.login(
+            email=EMAIL,
+            password=PASSWORD
+        )
+        save_cookie(bot.driver, str(data_dir) + "/cookies.txt")
+    
+    scrape_search(bot, "Data Scientist", "Canada")
+
+    save_cookie(bot.driver, str(data_dir) + "/cookies.txt")
+
