@@ -17,9 +17,7 @@ def load_cookie(driver, path):
          for cookie in cookies:
              driver.add_cookie(cookie)
 
-def scrape_search(bot, keywords, location):
-    logging.info("Going to Jobs page")
-    bot.go_to_job_page()
+def run(bot, keywords, location):
     logging.info("Begin linkedin keyword search")
     bot.search_linkedin(keywords = keywords, location = location)
     bot.wait()
@@ -72,7 +70,8 @@ if __name__ == "__main__":
         )
         save_cookie(bot.driver, str(data_dir) + "/cookies.txt")
     
-    scrape_search(bot, "Data Scientist", "Canada")
+    for keywords in ["Data Scientist", "Data Analyst"]:
+        bot.run(keywords, "Canada", db)
 
     save_cookie(bot.driver, str(data_dir) + "/cookies.txt")
 

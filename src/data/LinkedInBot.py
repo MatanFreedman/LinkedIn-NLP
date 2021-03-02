@@ -1,54 +1,50 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException, NoSuchElementException
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 import time
 from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv, find_dotenv
-import os 
 import logging
+import pickle
+
 
 class LinkedInBot:
-    def __init__(self, verbose=True, useProxy=False, delay=5):
-        self.verbose=verbose
+    def __init__(self, useProxy=False, delay=5):
         self.delay=delay
-
-        bot_dir = Path(__file__).resolve().parents[0]
-        driver_path = str(bot_dir) + "\\geckodriver.exe"
-
         self.proxy = self.create_proxy() if useProxy else None
-        self.driver = webdriver.Firefox(executable_path=driver_path, proxy=self.proxy)
+        
+        driver_path = str(Path(__file__).resolve().parents[0]) + "\\geckodriver.exe"
 
+        logging.info("Starting driver")
+        self.driver = webdriver.Firefox(executable_path=driver_path, proxy=self.proxy)
 
     def login(self, email, password):
         """Go to linkedin and login"""
-
         # go to linkedin:
+        logging.info("Logging in")
         self.driver.maximize_window()
         self.driver.get('https://www.linkedin.com/login')
-        
-        if self.verbose: print("Logging in...")
-        time.sleep(3)
-        login_email = self.driver.find_element_by_name('session_key')
-        login_email.send_keys(email)
-        # enter linkedin:
-        login_pass = self.driver.find_element_by_name('session_password')
-        login_pass.send_keys(password)
-        login_pass.send_keys(Keys.RETURN)
-        time.sleep(6)
+        time.sleep(self.delay)
 
+        self.driver.find_element_by_id('username').send_keys(email)
+        self.driver.find_element_by_id('password').send_keys(password)
+        self.driver.find_element_by_id('password').send_keys(Keys.RETURN)
+        time.sleep(self.delay)
 
-    def close_session(self):
-        """This function closes the actual session"""
-        print('End of the session!')
-        self.driver.close()
+    def save_cookie(self, path):
+        with open(path, 'wb') as filehandler:
+            pickle.dump(self.driver.get_cookies(), filehandler)
 
+    def load_cookie(self, path):
+        with open(path, 'rb') as cookiesfile:
+            cookies = pickle.load(cookiesfile)
+            for cookie in cookies:
+                self.driver.add_cookie(cookie)
 
     def create_proxy(self):
         response = requests.get('https://free-proxy-list.net')
@@ -70,32 +66,15 @@ class LinkedInBot:
             'sslProxy': myProxy,
             'noProxy': '' # set this value as desired
             })
-        print("Using proxy: ", myProxy)
+        logging.info("Using proxy: ", myProxy)
         return proxy
-
-
-    def go_to_job_page(self):
-        """ Go to job section and search using keywords and locations """
-        if self.verbose: print("Navigation to Jobs page...")
-        # go to Jobs
-        self.wait_for_element_ready(By.LINK_TEXT, 'Jobs')
-        jobs_link = self.driver.find_element_by_link_text('Jobs')
-        jobs_link.click()
-        time.sleep(self.delay)
-
-
-    def wait_for_element_ready(self, by, text):
-        try:
-            WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((by, text)))
-        except TimeoutException:
-            pass
-
 
     def search_linkedin(self, keywords, location):
         """Enter keywords into search bar
         """
+        logging.info("Searching jobs page")
+        self.driver.get("https://www.linkedin.com/jobs/")
         # search based on keywords and location and hit enter
-        logging.info("Waiting for page load")
         self.wait_for_element_ready(By.CLASS_NAME, 'jobs-search-box__text-input')
         time.sleep(self.delay)
         search_bars = self.driver.find_elements_by_class_name('jobs-search-box__text-input')
@@ -108,15 +87,15 @@ class LinkedInBot:
         logging.info("Keyword search successful")
         time.sleep(self.delay)
 
-
-    def get_job_page_list_items(self):
-        """Gets the sidebar items that are in view
-        
-        Returns: list of Selenium web elements
+    def wait(self, t_delay=None):
+        """Just easier to build this in here.
+        Parameters
+        ----------
+        t_delay [optional] : int
+            seconds to wait.
         """
-        list_items = self.driver.find_elements_by_class_name("occludable-update")
-        return list_items
-
+        delay = self.delay if t_delay == None else t_delay
+        time.sleep(delay)
 
     def scroll_to(self, job_list_item):
         """Just a function that will scroll to the list item in the column 
@@ -124,8 +103,7 @@ class LinkedInBot:
         self.driver.execute_script("arguments[0].scrollIntoView();", job_list_item)
         job_list_item.click()
         time.sleep(self.delay)
-    
-
+ 
     def get_position_data(self, job):
         """Gets the position data for a posting.
 
@@ -140,27 +118,75 @@ class LinkedInBot:
         [position, company, location] = job.text.split('\n')[:3]
         details = self.driver.find_element_by_id("job-details").text
         return [position, company, location, details]
+   
+    def wait_for_element_ready(self, by, text):
+        try:
+            WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((by, text)))
+        except TimeoutException:
+            logging.debug("wait_for_element_ready TimeoutException")
+            pass
 
+    def get_job_page_list_items(self):
+        """Gets the sidebar items that are in view
+        
+        Returns: list of Selenium web elements
+        """
+        return self.driver.find_elements_by_class_name("occludable-update")
 
-    def wait(self, t_delay=None):
-        """Just easier to build this in here.
+    def close_session(self):
+        """This function closes the actual session"""
+        logging.info("Closing session")
+        self.driver.close()
+
+    def run(self, keywords, location, db):
+        """Searchs keywords + location, then scrapes first 8 pages of LinkedIn.
+        After completed, will just post message "Done Scraping".
+
         Parameters
         ----------
-        t_delay [optional] : int
-            seconds to wait.
+        keywords : string
+        location : string
+        db : DBConnection class object
+            In DBConnection.py 
         """
-        delay = self.delay if t_delay == None else t_delay
-        time.sleep(delay)
+        logging.info("Begin linkedin keyword search")
+        self.search_linkedin(keywords, location)
+        self.wait()
+
+        # scrape pages,only do first 8 pages since after that the data isn't 
+        # well suited for me anyways:  
+        for page in range(2, 9):
+            # get the jobs list items to scroll through:
+            jobs = self.driver.find_elements_by_class_name("occludable-update")
+            for job in jobs:
+                self.scroll_to(job)
+                [position, company, location, details] = self.get_position_data(job)
+
+                # send to DB:
+                data = (position, company, location, details)
+                if not db.is_duplicate(data):
+                    db.insert_position(data)
+
+                    # just to view in cmd window:
+                    logging.info(f"Added to DB: {position}, {company}, {location}")
+                else:
+                    logging.info(f"Duplicate entry found: {position}, {company}, {location}")
+
+            # go to next page:
+            self.driver.find_element_by_xpath(f"//button[@aria-label='Page {page}']").click()
+            self.wait()
+        logging.info("Done scraping.")
 
 if __name__ == "__main__":
-    bot = LinkedInBot(useProxy=False)
+    from dotenv import load_dotenv, find_dotenv
+    import os 
 
-    EMAIL = os.getenv("EMAIL")
-    PASSWORD = os.getenv("PASSWORD")
+    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(level=logging.INFO, format=log_fmt)
+
+    load_dotenv(find_dotenv())
+    bot = LinkedInBot(useProxy=False)
     bot.login(
-        email=EMAIL,
-        password=PASSWORD
+        email=os.getenv("EMAIL"),
+        password=os.getenv("PASSWORD")
     )
-    bot.go_to_job_page()
-    bot.search_linkedin(keywords = "Data Analyst", location = "Canada")
-    bot.wait()
