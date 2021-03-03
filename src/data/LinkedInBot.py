@@ -12,22 +12,24 @@ from bs4 import BeautifulSoup
 import logging
 import pickle
 
+LOGGER = logging.getLogger(__name__)
 
 class LinkedInBot:
+
     def __init__(self, useProxy=False, delay=5):
         self.delay=delay
         self.proxy = self.create_proxy() if useProxy else None
         
-        driver_path = str(Path(__file__).resolve().parents[0]) + "\\geckodriver.exe"
+        LOGGER.info("starting driver")
 
-        logging.info("Starting driver")
+        driver_path = str(Path(__file__).resolve().parents[0]) + "\\geckodriver.exe"
         self.driver = webdriver.Firefox(executable_path=driver_path, proxy=self.proxy)
+        self.driver.maximize_window()
 
     def login(self, email, password):
         """Go to linkedin and login"""
         # go to linkedin:
-        logging.info("Logging in")
-        self.driver.maximize_window()
+        LOGGER.info("Logging in")
         self.driver.get('https://www.linkedin.com/login')
         time.sleep(self.delay)
 
@@ -37,10 +39,12 @@ class LinkedInBot:
         time.sleep(self.delay)
 
     def save_cookie(self, path):
+        LOGGER.info("Saving cookie")
         with open(path, 'wb') as filehandler:
             pickle.dump(self.driver.get_cookies(), filehandler)
 
     def load_cookie(self, path):
+        LOGGER.info("Loading cookies")
         with open(path, 'rb') as cookiesfile:
             cookies = pickle.load(cookiesfile)
             for cookie in cookies:
@@ -72,7 +76,7 @@ class LinkedInBot:
     def search_linkedin(self, keywords, location):
         """Enter keywords into search bar
         """
-        logging.info("Searching jobs page")
+        LOGGER.info("Searching jobs page")
         self.driver.get("https://www.linkedin.com/jobs/")
         # search based on keywords and location and hit enter
         self.wait_for_element_ready(By.CLASS_NAME, 'jobs-search-box__text-input')
@@ -80,11 +84,11 @@ class LinkedInBot:
         search_bars = self.driver.find_elements_by_class_name('jobs-search-box__text-input')
         search_keywords = search_bars[0]
         search_keywords.send_keys(keywords)
-        search_location = search_bars[2]
+        search_location = search_bars[3]
         search_location.send_keys(location)
         time.sleep(self.delay)
         search_location.send_keys(Keys.RETURN)
-        logging.info("Keyword search successful")
+        LOGGER.info("Keyword search successful")
         time.sleep(self.delay)
 
     def wait(self, t_delay=None):
@@ -123,7 +127,7 @@ class LinkedInBot:
         try:
             WebDriverWait(self.driver, self.delay).until(EC.presence_of_element_located((by, text)))
         except TimeoutException:
-            logging.debug("wait_for_element_ready TimeoutException")
+            LOGGER.debug("wait_for_element_ready TimeoutException")
             pass
 
     def get_job_page_list_items(self):
@@ -149,7 +153,7 @@ class LinkedInBot:
         db : DBConnection class object
             In DBConnection.py 
         """
-        logging.info("Begin linkedin keyword search")
+        LOGGER.info("Begin linkedin keyword search")
         self.search_linkedin(keywords, location)
         self.wait()
 
@@ -168,25 +172,41 @@ class LinkedInBot:
                     db.insert_position(data)
 
                     # just to view in cmd window:
-                    logging.info(f"Added to DB: {position}, {company}, {location}")
+                    LOGGER.info(f"Added to DB: {position}, {company}, {location}")
                 else:
-                    logging.info(f"Duplicate entry found: {position}, {company}, {location}")
+                    LOGGER.info(f"Duplicate entry found: {position}, {company}, {location}")
 
             # go to next page:
             self.driver.find_element_by_xpath(f"//button[@aria-label='Page {page}']").click()
             self.wait()
-        logging.info("Done scraping.")
+        LOGGER.info("Done scraping.")
 
 if __name__ == "__main__":
     from dotenv import load_dotenv, find_dotenv
+    from src.data.DBConnection import DBConnection
     import os 
 
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
+    data_dir = Path(__file__).resolve().parents[0]
+
     load_dotenv(find_dotenv())
+    db = DBConnection()
     bot = LinkedInBot(useProxy=False)
-    bot.login(
-        email=os.getenv("EMAIL"),
-        password=os.getenv("PASSWORD")
-    )
+    if os.path.exists(str(data_dir) + "/cookies.txt"):
+        bot.driver.get("https://www.linkedin.com/")
+        bot.load_cookie( str(data_dir) + "/cookies.txt")
+        bot.driver.get("https://www.linkedin.com/")
+    else:
+        EMAIL = os.getenv("EMAIL")
+        PASSWORD = os.getenv("PASSWORD")
+        bot.login(
+            email=EMAIL,
+            password=PASSWORD
+        )
+        bot.save_cookie(str(data_dir) + "/cookies.txt")
+    
+
+    bot.run("Data Analyst", "Canada", db)
+
