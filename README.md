@@ -1,7 +1,11 @@
-JobBot
+Job Description NLP Project
 ==============================
 
 Scrape job websites & analyze job description text.
+
+- Currently in progress, in the "Data Cleaning" stage.
+
+<br><br><br>
 
 Project Organization
 ------------
