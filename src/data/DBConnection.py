@@ -4,6 +4,25 @@ import logging
 
 
 class DBConnection:
+    """Database connection object. 
+
+    Notes
+    -----
+    The object will check for a db called "linkedin_data.db" in the data folder and will 
+    create one if it doesn't find it.
+
+
+    Attributes
+    ---------
+    project_path : str
+        root path string
+    data_path : str
+        path of data folder for saving files
+    conn : sqlite3 connection
+        used to connect to DB
+    cur : sqlite3 cursor
+        used to execute queries with DB
+    """
     project_path = Path(__file__).resolve().parents[2]
     data_path = str(project_path) + "/data/raw/"
     conn = sqlite3.connect(data_path + 'linkedin_data.db')
@@ -35,9 +54,12 @@ class DBConnection:
 
         Parameters
         ---------
-        data : tuple : (position, company, location, details) - all strings
+        data : tuple of str
+            (position, company, location, details) - all strings
 
-        Returns : Boolean if duplicate
+        Returns
+        -------
+            bool if duplicate
         """
         # check DB for duplicate:
         self.cur.execute("""
