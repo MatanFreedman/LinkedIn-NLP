@@ -9,6 +9,8 @@ import logging
 from pathlib import Path
 
 def __init__():
+    """Downloads required packages
+    """
     nltk.download('stopwords')
     nltk.download('averaged_perceptron_tagger')
     nltk.download('wordnet')
@@ -33,6 +35,7 @@ def tokenize(text):
     words : list of str
         list of words
     """
+
     clean_text = text.replace("\n", " ")
     clean_text = clean_text.lower()
     words = ["".join(c for c in s if c not in string.punctuation) for s in clean_text.split(" ")]
@@ -81,7 +84,7 @@ def preprocess_pipeline(text):
     lemmed_words : list of str
         list of cleaned, tokenized, and lemmatized words
     """
-    words = tokenize(text)
+    words = tokenize(text[0])
     lemmed_words = lematize(words)
     return lemmed_words
 
