@@ -90,15 +90,5 @@ class DBConnection:
             """, data)
         self.conn.commit()
 
-    def create_results_table(self):
-        """Check if DB exists, create table if it doesnt
-        """
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS results(
-            id INTEGER PRIMARY KEY NOT NULL,
-            positions_id INT NOT NULL
-            );
-        """)
-        self.conn.commit()
-
 if __name__ == "__main__":
     db = DBConnection()
