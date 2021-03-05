@@ -43,6 +43,10 @@ class DBConnection:
             date INT
             );
         """)
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS results(
+            id INTEGER PRIMARY KEY NOT NULL
+            );
+        """)
         self.conn.commit()
 
     def close(self):
@@ -89,6 +93,8 @@ class DBConnection:
             INSERT INTO positions(position, company, location, details, date) VALUES (?, ?, ?, ?, date('now'))
             """, data)
         self.conn.commit()
+
+    
 
 if __name__ == "__main__":
     db = DBConnection()
