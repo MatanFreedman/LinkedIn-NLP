@@ -41,4 +41,4 @@ def bag_of_words_tfid_norm():
 
     # print time:
     logger.info(f"Feature building took {round(time.time() - t0, 2)} seconds")
-    return features
+    return features, pipe
