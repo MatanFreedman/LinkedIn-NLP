@@ -34,6 +34,7 @@ class LinkedInBot:
         if headless:
             options = webdriver.firefox.options.Options()
             options.set_headless()
+            LOGGER.info("Driver will be headless")
         else:
             options = None
             

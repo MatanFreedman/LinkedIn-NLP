@@ -18,7 +18,8 @@ import logging
 def load_saved_features(date="2021-03-07"):
     """Function used to grab the saved features and pipe
 
-    path : str
+    date : str
+        YYYY-MM-DD format. Used to grad to correct features and pipeline file in the processed dir.
     """
     logger = logging.getLogger(__name__)
     
