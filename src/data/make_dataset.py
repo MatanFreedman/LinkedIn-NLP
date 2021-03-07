@@ -40,7 +40,11 @@ def tokenize(text):
     clean_text = clean_text.lower()
     words = ["".join(c for c in s if c not in string.punctuation) for s in clean_text.split(" ")]
     words = [w for w in words if w is not ""]
-    words = [w for w in words if w not in stopwords.words("english")]
+    words = [
+        w for w in words if 
+        w not in stopwords.words("english") 
+        and w not in stopwords.words("french")
+    ]
     return words
 
 def wordnet_tags(tag): 

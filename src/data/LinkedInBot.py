@@ -18,7 +18,7 @@ class LinkedInBot:
     """Bot used to scrape LinkedIn
     """
 
-    def __init__(self, useProxy=False, delay=5):
+    def __init__(self, useProxy=False, delay=5, headless=True):
         """
         Parameters
         ----------
@@ -31,9 +31,15 @@ class LinkedInBot:
         self.delay=delay
         self.proxy = self.create_proxy() if useProxy else None
         
+        if headless:
+            options = webdriver.firefox.options.Options()
+            options.set_headless()
+        else:
+            options = None
+            
         LOGGER.info("starting driver")
-        driver_path = str(Path(__file__).resolve().parents[0]) + "\\geckodriver.exe"
-        self.driver = webdriver.Firefox(executable_path=driver_path, proxy=self.proxy)
+        driver_path = str(Path(__file__).resolve().parents[0]) + "\\geckodriver.exe"    
+        self.driver = webdriver.Firefox(executable_path=driver_path, proxy=self.proxy, options=options)
         self.driver.maximize_window()
 
     def login(self, email, password):

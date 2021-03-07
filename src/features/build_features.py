@@ -8,8 +8,33 @@ from src.data.make_dataset import preprocess_pipeline
 
 import time 
 from numpy import round
+from pathlib import Path
+import scipy
+import pickle
 
 import logging
+
+
+def load_saved_features(date="2021-03-07"):
+    """Function used to grab the saved features and pipe
+
+    path : str
+    """
+    logger = logging.getLogger(__name__)
+    
+    proj_path = Path(__file__).resolve().parents[2]
+    processed_path = proj_path / "data" / "processed"
+
+    logger.info("Loading features and pipe from /data/processed/")
+
+    features = scipy.sparse.load_npz(str(processed_path / f"features_{date}.npz"))
+    pipe_path = str(processed_path / f"pipe_{date}.pkl")
+    with open(pipe_path, 'rb') as file:
+        pipe = pickle.load(file)
+
+    return features, pipe
+
+
 
 def bag_of_words_tfid_norm():
     """Builds main featureset using the preprocessing pipeline, TF-IDF vectorizer + TF-IDF transformer
@@ -17,7 +42,6 @@ def bag_of_words_tfid_norm():
     """
     logger = logging.getLogger(__name__)
     logger.info("Building TF-IDF vector + normalizing")
-
     # start timer:
     t0 = time.time()
 

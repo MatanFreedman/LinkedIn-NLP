@@ -23,12 +23,12 @@ class DBConnection:
     cur : sqlite3 cursor
         used to execute queries with DB
     """
-    project_path = Path(__file__).resolve().parents[2]
-    data_path = str(project_path) + "/data/raw/"
-    conn = sqlite3.connect(data_path + 'linkedin_data.db')
-    cur = conn.cursor()
 
-    def __init__(self):
+    def __init__(self, rel_path="/data/raw/linkedin_data.db"):
+        project_path = Path(__file__).resolve().parents[2]
+        DB_path = str(project_path) + str(rel_path)
+        self.conn = sqlite3.connect(DB_path)
+        self.cur = self.conn.cursor()
         self.initialize()
 
     def initialize(self):
