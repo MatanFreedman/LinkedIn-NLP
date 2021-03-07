@@ -23,12 +23,12 @@ class DBConnection:
     cur : sqlite3 cursor
         used to execute queries with DB
     """
-    project_path = Path(__file__).resolve().parents[2]
-    data_path = str(project_path) + "/data/raw/"
-    conn = sqlite3.connect(data_path + 'linkedin_data.db')
-    cur = conn.cursor()
 
-    def __init__(self):
+    def __init__(self, rel_path="/data/raw/linkedin_data.db"):
+        project_path = Path(__file__).resolve().parents[2]
+        DB_path = str(project_path) + str(rel_path)
+        self.conn = sqlite3.connect(DB_path)
+        self.cur = self.conn.cursor()
         self.initialize()
 
     def initialize(self):
@@ -41,6 +41,10 @@ class DBConnection:
             location TEXT,
             details TEXT,
             date INT
+            );
+        """)
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS results(
+            id INTEGER PRIMARY KEY NOT NULL
             );
         """)
         self.conn.commit()
@@ -90,15 +94,7 @@ class DBConnection:
             """, data)
         self.conn.commit()
 
-    def create_results_table(self):
-        """Check if DB exists, create table if it doesnt
-        """
-        self.cur.execute("""CREATE TABLE IF NOT EXISTS results(
-            id INTEGER PRIMARY KEY NOT NULL,
-            positions_id INT NOT NULL
-            );
-        """)
-        self.conn.commit()
+    
 
 if __name__ == "__main__":
     db = DBConnection()
