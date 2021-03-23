@@ -67,3 +67,10 @@ def bag_of_words_tfid_norm():
     # print time:
     logger.info(f"Feature building took {round(time.time() - t0, 2)} seconds")
     return features, pipe
+
+
+def main():
+    features = bag_of_words_tfid_norm()
+
+if __name__ == "__main__":
+    main()

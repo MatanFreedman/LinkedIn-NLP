@@ -8,12 +8,10 @@ import nltk
 import logging
 from pathlib import Path
 
-def __init__():
-    """Downloads required packages
-    """
-    nltk.download('stopwords')
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('wordnet')
+
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
 
 
 def tokenize(text):
