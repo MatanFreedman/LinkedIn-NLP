@@ -1,6 +1,5 @@
 
-import sklearn.feature_extraction.text 
-from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer, CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
 
 from src.data.DBConnection import DBConnection
@@ -42,7 +41,7 @@ def bag_of_words_tfid_norm():
     to normalize dataset.
     """
     logger = logging.getLogger(__name__)
-    logger.info("Building TF-IDF vector + normalizing")
+    logger.info("Building TF-IDF vector")
     # start timer:
     t0 = time.time()
 
@@ -67,3 +66,10 @@ def bag_of_words_tfid_norm():
     # print time:
     logger.info(f"Feature building took {round(time.time() - t0, 2)} seconds")
     return features, pipe
+
+
+def main():
+    features = bag_of_words_tfid_norm()
+
+if __name__ == "__main__":
+    main()

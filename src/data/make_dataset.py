@@ -8,12 +8,12 @@ import nltk
 import logging
 from pathlib import Path
 
-def __init__():
-    """Downloads required packages
-    """
-    nltk.download('stopwords')
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('wordnet')
+from typing_extensions import final
+
+
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
 
 
 def tokenize(text):
@@ -39,11 +39,18 @@ def tokenize(text):
     clean_text = text.replace("\n", " ")
     clean_text = clean_text.lower()
     words = ["".join(c for c in s if c not in string.punctuation) for s in clean_text.split(" ")]
-    words = [w for w in words if w is not ""]
+
+    en_stopwords = set(stopwords.words("english"))
+    fr_stopwords = set(stopwords.words("french"))
+    remove_words = set([
+        "souhaitezvous", "http", "mitigationoptimization", "", "comprendre",
+        "damélioration"
+    ])
+    final_remove_words = en_stopwords.union(fr_stopwords)
+    final_remove_words = final_remove_words.union(remove_words)
     words = [
         w for w in words if 
-        w not in stopwords.words("english") 
-        and w not in stopwords.words("french")
+        w not in final_remove_words
     ]
     return words
 

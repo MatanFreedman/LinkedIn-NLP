@@ -3,7 +3,18 @@ Job Description NLP Project
 
 Scrape job websites & analyze job description text.
 
-- Currently in progress, in the "Data Cleaning" stage.
+- Currently in progress, iterating between Data Cleaning and Topic Modelling (see notebooks folder).
+
+
+To build project:
+1. `python -m venv venv`
+2. `venv\Scripts\activate`
+3. `pip install -r requirements.txt`
+4. Create a .env file with LinkedIn EMAIL and PASSWORD like:<Br>
+    EMAIL="your@email.com"<br>
+    PASSWORD="your_password"
+5. Scrape data: `python Makefile.py`
+6. 
 
 <br><br><br>
 
