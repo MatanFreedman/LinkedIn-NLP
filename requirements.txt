@@ -10,10 +10,13 @@ chardet==4.0.0
 click==7.1.2
 colorama==0.4.4
 cycler==0.10.0
+Cython==0.29.14
 decorator==4.4.2
 defusedxml==0.6.0
 entrypoints==0.3
+gensim==3.8.3
 idna==2.10
+importlib-metadata==3.7.2
 ipykernel==5.5.0
 ipython==7.20.0
 ipython-genutils==0.2.0
@@ -40,7 +43,7 @@ nltk==3.5
 notebook==6.2.0
 numpy==1.20.1
 packaging==20.9
-# pandas==1.2.3
+pandas==1.1.5
 pandocfilters==1.4.3
 parso==0.8.1
 pickleshare==0.7.5
@@ -66,15 +69,18 @@ scipy==1.6.1
 selenium==3.141.0
 Send2Trash==1.5.0
 six==1.15.0
+smart-open==4.2.0
 soupsieve==2.2
--e git+https://github.com/MatanFreedman/jobbot.git@672066f83e1b7989b9cd03f012ac1e7bef444ac6#egg=src
+-e git+https://github.com/MatanFreedman/LinkedIn-NLP.git@637c16bfefcaa2e95e76b8b7aa591bdd648ce431#egg=src
 terminado==0.9.2
 testpath==0.4.4
 threadpoolctl==2.1.0
 tornado==6.1
 tqdm==4.58.0
 traitlets==5.0.5
+typing-extensions==3.7.4.3
 urllib3==1.26.3
 wcwidth==0.2.5
 webencodings==0.5.1
 widgetsnbextension==3.5.1
+zipp==3.4.1

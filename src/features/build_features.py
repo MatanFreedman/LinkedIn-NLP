@@ -57,7 +57,7 @@ def bag_of_words_tfid_norm():
     tfidf = Pipeline([('tfid', TfidfTransformer())])
     pipe = Pipeline([
         ('tfidf_vec', tfidf_vec),
-        ('tfidf', tfidf)
+        # ('tfidf', tfidf)
     ])
 
     # fit pipeline:
