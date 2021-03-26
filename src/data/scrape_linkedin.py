@@ -4,6 +4,8 @@ import logging
 import pickle
 from pathlib import Path
 
+from selenium.common.exceptions import StaleElementReferenceException
+
 from src.data.DBConnection import DBConnection 
 from src.data.LinkedInBot import LinkedInBot
 
@@ -71,8 +73,13 @@ def main():
         )
         bot.save_cookie(str(data_dir) + "/cookies.txt")
     
-    for keywords in ["Data Scientist", "Data Analyst"]:
-        bot.run(keywords, "Canada", db)
+    for keywords in ["Structual Engineer", "Management Consultant"]:
+        try:
+            bot.run(keywords, "Canada", db)
+        except StaleElementReferenceException:
+            logger.debug("StaleElementReferenceException: Element not found (end of results?)")
+            logger.info("StaleElementReferenceException: skipping to next run.")
+            continue
 
     save_cookie(bot.driver, str(data_dir) + "/cookies.txt")
     bot.close_session()
