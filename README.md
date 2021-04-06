@@ -28,15 +28,21 @@ The keywords for these descriptions are shown below.
 
 ![Topic Terms](https://github.com/MatanFreedman/LinkedIn-NLP/blob/master/notebooks/topic-modelling/topic_terms.PNG)
 
-The topic distribution (shown below) shows that Data Analyst postings far exceed that of any other topic. I was expecting a similar amount of Data Scientist topics however there could be a few reasons for this. Some Data Scientist postings could actually be for Data Analyst-type job descriptions, and whoever posted them is using the wrong label. The model could also be miss-classifying these jobs since the language between the two descriptions is likely very similar. 
+The topic distribution (shown below) shows that Data Analyst postings far exceed that of any other topic. I was expecting a similar amount of Data Scientist topics however there could be a few reasons for this. Some Data Scientist postings could actually be for Data Analyst-type job descriptions, and whoever posted them is using the wrong label. The model could also be miss-classifying these jobs since the language between the two descriptions is likely very similar. LinkedIn may be showing me jobs that it recommends first almost regardless of the keywords searched, therefore they may be recommending me lots more Data Analyst jobs even when my bot searched "Data Scientist".
 
-![Topic Frequencies](https://github.com/MatanFreedman/LinkedIn-NLP/blob/master/notebooks/topic-modelling/topic_frequencies.PNG)
+![Topic Frequencies](https://github.com/MatanFreedman/LinkedIn-NLP/blob/master/notebooks/topic-modelling/topic_frequencies.png)
+
+We can also see how similar the topics are by using a python LDA visualization library (pyLDAvis) that displays the topics as points in PCA space (using PC1 and PC2), and the size of each point represents the frequency of the topic in the dataset. The pyLDAvis results are shown below. 
+
+![pyLDAvis](https://github.com/MatanFreedman/LinkedIn-NLP/blob/master/notebooks/topic-modelling/pyldavis.PNG)
+
+You can see that Topic 2 (Data Analyst) and Topic 4 (Data Scientist) are closely related which makes sense. Topic 2 is much larger than the other topics due to the imbalancedness of the dataset. Topic 1 (Accountant) and Topic 3 (Civil Engineer) are also closely related, which is a bit surprising but it might make sense since both jobs likely involve budgets, reporting, and excel skills. Finally, Topic 5 (Restaurant) is small and far away from all the other topics, which makes sense since it is not at all related to the other job industries.  
 
 Conclusions
 -----------
 The LDA
 
-How to Use
+How to Use Web Scraper and Set Up Project
 ==================================
 To build project:
 1. `python -m venv venv`
@@ -93,5 +99,3 @@ Project Organization
     │       └── visualize.py
     │
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
-<p><small><a href="https://medium.com/@rrfd/cookiecutter-data-science-organize-your-projects-atom-and-jupyter-2be7862f487e">Good explanation for how to use this template here </a></small></p>
