@@ -47,11 +47,7 @@ You can see that Topic 2 (Data Analyst) and Topic 4 (Data Scientist) are closely
 Conclusions
 -----------
 The LDA model created the expected topics: Data Scientist, Data Analyst, Accountant, Civil Engineer, and Restaurant Employee. The model was able to handle the largely imbalanced dataset (many more records of Data Analyst and Data Scientist), however the model identified many more Data Analyst positions over Data Scientist positions. This may be due to model error, job poster, or by the LinkedIn recommendation algorithm overriding the search words.
-
-
-
-
-
+<br><br><br><br>
 How To Set Up Project
 ==================================
 To build project:
@@ -63,7 +59,6 @@ To build project:
     PASSWORD="your_password"
 5. Scrape data: `python Makefile.py`
 
-<br><br><br>
 
 Project Organization
 ------------
