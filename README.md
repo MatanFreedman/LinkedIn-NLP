@@ -28,18 +28,18 @@ My final LDA model had a coherence score of 0.544 and had 5 topics which were si
 
 The keywords for these descriptions are shown below. 
 
-### Table 1: Top-10 terms for each topic in the LDA model.
+##### Table 1: Top-10 terms for each topic in the LDA model.
 ![Topic Terms](https://github.com/MatanFreedman/LinkedIn-NLP/blob/master/notebooks/topic-modelling/topic_terms.PNG)
 
 The topic frequencies (shown below) shows that number of Data Analyst postings far exceeded those of any other topic. I was expecting a similar number of Data Scientist postings, however there could be a few reasons for this. Some Data Scientist search results may actually be for Data Analyst-type jobs, and whoever posted them is using the wrong label (e.g., an inexperienced hiring manager or recruiter). The model could also be misclassifying some Data Scientist jobs as Data Analyst jobs since the language between the two descriptions is likely very similar. LinkedIn may also be showing me jobs that it recommends regardless of the keywords searched, therefore they may be recommending me more Data Analyst jobs even when my bot searched "Data Scientist".
 
 ![Topic Frequencies](https://github.com/MatanFreedman/LinkedIn-NLP/blob/master/notebooks/topic-modelling/topic_frequencies.png)
-### Figure 1: Topic frequencies in corpus.
+##### Figure 1: Topic frequencies in corpus.
 
 We can also see how similar the topics are by using a python LDA visualization library (pyLDAvis) that displays the topics as points in PCA space (using PC1 and PC2), and the size of each point representing the frequency of the topic in the dataset. The pyLDAvis results are shown below. 
 
 ![pyLDAvis](https://github.com/MatanFreedman/LinkedIn-NLP/blob/master/notebooks/topic-modelling/pyldavis.PNG)
-### Figure 2: Topic similarity and frequency. The topics are represented as points in 2D (PCA) space, so points that are closer together are similar, and points that are further apart are less similar. The size of each point corresponds to the relative frequency of that topic in the corpus. 
+##### Figure 2: Topic similarity and frequency. The topics are represented as points in 2D (PCA) space, so points that are closer together are similar, and points that are further apart are less similar. The size of each point corresponds to the relative frequency of that topic in the corpus. 
 
 You can see that Topic 2 (Data Analyst) and Topic 4 (Data Scientist) are closely related which makes sense. Topic 2 is much larger than the other topics due to the imbalancedness of the dataset. Topic 1 (Accountant) and Topic 3 (Civil Engineer) are also closely related, which is a bit surprising but it might make sense since both jobs likely involve budgets, reporting, and excel skills. Finally, Topic 5 (Restaurant) is small and far away from all the other topics, which makes sense since it is not at all related to the other job industries.  
 
