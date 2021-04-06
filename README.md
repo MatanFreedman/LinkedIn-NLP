@@ -41,12 +41,12 @@ We can also see how similar the topics are by using a python LDA visualization l
 ![pyLDAvis](https://github.com/MatanFreedman/LinkedIn-NLP/blob/master/notebooks/topic-modelling/pyldavis.PNG)
 #### Figure 2: Topic similarity and frequency. The topics are represented as points in 2D (PCA) space, so points that are closer together are similar, and points that are further apart are less similar. The size of each point corresponds to the relative frequency of that topic in the corpus. 
 
-You can see that Topic 2 (Data Analyst) and Topic 4 (Data Scientist) are closely related which makes sense. Topic 2 is much larger than the other topics due to the imbalancedness of the dataset. Topic 1 (Accountant) and Topic 3 (Civil Engineer) are also closely related, which is a bit surprising but it might make sense since both jobs likely involve budgets, reporting, and excel skills. Finally, Topic 5 (Restaurant) is small and far away from all the other topics, which makes sense since it is not at all related to the other job industries.  
+You can see that Topic 2 (Data Analyst) and Topic 4 (Data Scientist) are closely related which makes sense. Topic 2 is much larger than the other topics due to the imbalancedness of the dataset or model error (these two topics may be too similar to distinguish). Topic 1 (Accountant) and Topic 3 (Civil Engineer) are also closely related, which is a bit surprising but it might make sense since both jobs likely involve budgets, reporting, and excel skills. Finally, Topic 5 (Restaurant) is small and far away from all the other topics, which makes sense since it is not at all related to the other job industries.  
 
 
 Conclusions
 -----------
-The LDA model created the expected topics: Data Scientist, Data Analyst, Accountant, Civil Engineer, and Restaurant Employee. The model was able to handle the largely imbalanced dataset (many more records of Data Analyst and Data Scientist), however the model identified many more Data Analyst positions over Data Scientist positions. This may be due to model error, job poster, or by the LinkedIn recommendation algorithm overriding the search words.
+The LDA model created the expected topics: Data Scientist, Data Analyst, Accountant, Civil Engineer, and Restaurant Employee. The model was able to handle the largely imbalanced dataset (many more records of Data Analyst and Data Scientist), however the model identified many more Data Analyst positions over Data Scientist positions. This may be due to model error, job poster, or by the LinkedIn recommendation algorithm overriding the search words. Further work would be to look into the Data Analyst and Data Scientist imbalance, as well as to compare the accuracy of the topics to the classified texts.
 <br><br><br><br>
 
 How To Set Up Project
